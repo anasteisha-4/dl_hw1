@@ -9,12 +9,9 @@ class ResidualBlockWithDropout(nn.Module):
             nn.Linear(hidden_size, hidden_size * 4),
             nn.ReLU(),
             nn.Dropout(dropout_p),
-            nn.BatchNorm1d(hidden_size * 4),
             nn.Linear(hidden_size * 4, hidden_size),
-            nn.ReLU(),
-            nn.Dropout(dropout_p)
         )
-    
+
     def forward(self, x):
         return x + self.block(x)
 

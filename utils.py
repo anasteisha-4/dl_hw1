@@ -5,7 +5,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
 import pandas as pd
 import numpy as np
 
@@ -18,22 +18,27 @@ def process_data():
 
     num_features = ["person_age", "person_income", "person_emp_length", "loan_amnt", "loan_int_rate", "loan_percent_income", "cb_person_cred_hist_length"]
     cat_features = ["person_home_ownership", "loan_intent", "loan_grade", "cb_person_default_on_file"]
-    scaler = StandardScaler()
-    df[num_features] = scaler.fit_transform(df[num_features])
-    label_encoders = {}
-    for col in cat_features:
-        le = LabelEncoder()
-        df[col] = le.fit_transform(df[col])
-        label_encoders[col] = le
 
     X = df.drop(columns=["loan_status"])
     y = df["loan_status"].values
-    
+
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=seed, stratify=y)
 
-    X_train_tensor = torch.tensor(X_train.values, dtype=torch.float32)
+    scaler = StandardScaler()
+    X_train_num = scaler.fit_transform(X_train[num_features])
+    X_val_num = scaler.transform(X_val[num_features])
+
+    encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
+    X_train_cat = encoder.fit_transform(X_train[cat_features])
+    X_val_cat = encoder.transform(X_val[cat_features])
+
+    X_train = np.concatenate([X_train_num, X_train_cat], axis=1)
+    X_val = np.concatenate([X_val_num, X_val_cat], axis=1)
+    
+
+    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
     y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-    X_val_tensor = torch.tensor(X_val.values, dtype=torch.float32)
+    X_val_tensor = torch.tensor(X_val, dtype=torch.float32)
     y_val_tensor = torch.tensor(y_val, dtype=torch.float32)
     
     batch_size = 32

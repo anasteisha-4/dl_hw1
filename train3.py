@@ -8,9 +8,7 @@ class ResidualBlock(nn.Module):
             nn.BatchNorm1d(hidden_size),
             nn.Linear(hidden_size, hidden_size * 4),
             nn.ReLU(),
-            nn.BatchNorm1d(hidden_size * 4),
             nn.Linear(hidden_size * 4, hidden_size),
-            nn.ReLU()
         )
 
     def forward(self, x):

@@ -27,6 +27,6 @@ show_graphs(train_losses, val_losses, train_roc_auc, val_roc_auc)
 
 # подбираем оптимальное число эпох
 model = SimpleModel(input_dim)
-num_epochs = 15
+num_epochs = 20
 train_losses, val_losses, train_roc_auc, val_roc_auc = train(model, train_loader, val_loader, num_epochs)
 show_graphs(train_losses, val_losses, train_roc_auc, val_roc_auc, num_epochs)
